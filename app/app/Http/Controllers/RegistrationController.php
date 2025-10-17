@@ -20,17 +20,44 @@ class RegistrationController extends Controller
         ]);
     }
 
-    public function eventJoin(Request $request) {
+    public function eventJoin(int $id, Request $request) {
         $event_user = new  Event_user;
+        $eventId = Event::find($id);
+        $user = Auth::id();
 
-        $event_user->event_id = $request->event_id;
-        $event_user->user_id = $request->user_id;
+        $event_user->event_id = $eventId->id;
+        $event_user->user_id = $user;
         $event_user->comment = $request->comment;
         $event_user->step = 1;
 
         $event_user->save();
 
         return redirect('/top');
+    }
+
+    //イベント参加取り消し
+    public function userCancelform($eventId) { 
+        $user = Auth::id();
+        $event = Event::find($eventId);
+
+        return view('user_cancel',[
+            'user' => $user,
+            'event' => $event,
+        ]);
+    }
+
+    public function userCancel(Request $request) {
+        $user = Auth::user();
+        $userId = $user->id;
+        $eventId = $request->input('event_id');
+        $events = $user->Event_user->map(fn($eu) => $eu->Event);
+
+        Event_user::where('event_id', $eventId)->where('user_id', $userId)->delete();
+
+        return redirect()->route('user.join', [
+            'id' => $userId,
+            'events' => $events,
+        ]);
     }
 
     //プロフィール編集
@@ -58,6 +85,101 @@ class RegistrationController extends Controller
 
         $user->save();
         $date->save();
+
+        return redirect($url);
+    }
+
+    //退会・ログアウト画面
+    public function userEdit($userId) {
+        $user = User::find($userId);
+        $date = $user->userDate;
+
+        return view('user_edit', [
+            'user' => $user,
+            'date' => $date,
+        ]);
+    }
+
+    public function delete(Request $request) {
+        $user = Auth::user();
+
+        $user ->delete();
+
+        return redirect('/login');
+    }
+
+    //イベント編集画面
+    public function eventEditform($eventId) {
+        $Event = Event::find($eventId);
+        $prevUrl = url()->previous();
+        session(['profile_url' => $prevUrl]);
+
+        return view('event_edit', [
+            'event' => $Event,
+        ]);
+    }
+
+    public function eventEdit(int $id, Request $request) {
+        $event = new Event;
+        $record = $event->find($id);
+        $url = session('profile_url');
+
+        $colums = ['capacity', 'title', 'image', 'comment', 'date', 'format'];
+
+        foreach ($colums as $colum) {
+            $record -> $colum = $request -> $colum;
+        }
+
+        $record->save();
+
+        return redirect($url);
+    }
+
+    //イベント削除確認画面
+    public function eventDestroyform($eventId) {
+        $event = Event::find($eventId);
+        
+        return view('event_destroy', [
+            'event' => $event,
+        ]);
+    }
+
+    public function eventDestroy(int $id, Request $request) {
+        $event = Event::find($id);
+        $event -> delete();
+
+        $userId = Auth::id();
+
+        return redirect()->route('event.main', [
+            'id' => $userId,
+        ]);
+    }
+
+
+    //イベント作成画面
+    public function eventCreateform() {
+        $user = Auth::user();
+        $prevUrl = url()->previous();
+        session(['profile_url' => $prevUrl]);
+
+        return view('event_create', [
+            'user' => $user,
+        ]);
+    }
+
+    public function eventCreate(int $id, Request $request) {
+        $user = Auth::id();
+        $event = new Event;
+        $url = session('profile_url');
+
+        $colums = ['capacity', 'title', 'image', 'comment', 'date', 'format', 'type'];
+
+        foreach ($colums as $colum) {
+            $event -> $colum = $request -> $colum;
+        }
+        $event -> user_id = $user;
+        
+        $event->save();
 
         return redirect($url);
     }

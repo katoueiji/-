@@ -4,6 +4,8 @@
 <div class="container">
     <h2>データ確認</h2>
 
+    <h2>本当にキャンセルしますか？</h2>
+
     <table class="table table-bordered mt-3">
             <tr>
                 <th>{{ $event->id }}</th>
@@ -15,11 +17,12 @@
     </table>
 
     <div class="mt-4">
-        <form action="{{ route('event.join', ['id' => $event->id]) }}" method="POST">
+        <form action="{{ route('user.join', ['id' => $event->id]) }}" method="get">
+            <button type="submit" class="btn btn-primary">戻る</button>
+        </form>
+        <form action="{{ route('user.cancel', ['id' => $event->id]) }}" method="POST">
             @csrf
-            <label for='comment'>こめんト</label>
-            <input type='text' class='form-control' name='comment'/>
-            <button type="submit" class="btn btn-primary">参加する</button>
+            <button type="submit" class="btn btn-primary">キャンセル</button>
         </form>
     </div>
 </div>

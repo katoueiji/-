@@ -17,4 +17,13 @@
     <form action="{{ route('profile.edit', ['id' => $user->id]) }}" method="get">
         <button type="submit" class="btn btn-primary">プロフィール編集</button>
     </form>
+    <form action="{{ route('user.edit', ['id' => $user->id]) }}" method="get">
+        <button type="submit" class="btn btn-primary">ログアウト・退会</button>
+    </form>
+    <form action="{{ route('event.main', ['id' => $user->id]) }}" method="get">
+        <button type="submit" class="btn btn-primary">主催イベント一覧</button>
+    </form>
+    <form action="{{ route('user.join', ['id' => $user->id]) }}" method="get">
+        <button type="submit" class="btn btn-primary">参加イベント一覧</button>
+    </form>
 @endsection
