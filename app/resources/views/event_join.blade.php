@@ -15,12 +15,16 @@
     </table>
 
     <div class="mt-4">
+        @if($Event_user == 0)
         <form action="{{ route('event.join', ['id' => $event->id]) }}" method="POST">
             @csrf
             <label for='comment'>こめんト</label>
             <input type='text' class='form-control' name='comment'/>
             <button type="submit" class="btn btn-primary">参加する</button>
         </form>
+        @else
+        <button class="btn btn-primary" disabled>参加済み</button>
+        @endif
     </div>
 </div>
 @endsection

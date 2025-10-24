@@ -3,6 +3,7 @@
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Auth;
+use App\Event_user;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::resource('/upload', 'UploadController');
 
 Route::get('/top', [DisplayController::class, 'index']);
 Route::get('/event/{id}/detail', [DisplayController::class, 'eventDetail'])->name('event.detail');
@@ -49,3 +51,9 @@ Route::get('/user/{id}/join/cancel', [RegistrationController::class, 'userCancel
 Route::post('/user/{id}/join/cancel', [RegistrationController::class, 'userCancel']);
 
 
+
+Route::get('/debug-user-events', function () {
+    $userId = Auth::id(); // ログイン中のユーザーID
+    $records = Event_user::where('user_id', $userId)->get();
+    dd($records);
+});

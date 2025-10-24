@@ -13,6 +13,6 @@ class Event extends Model
 
     public function Event_user()
     {
-        return $this->hasMany('App\Event_user', 'id', 'event_sid');
+        return $this->hasMany('App\Event_user', 'id', 'event_id');
     }
 }

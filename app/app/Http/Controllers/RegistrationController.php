@@ -14,9 +14,18 @@ class RegistrationController extends Controller
     //イベント参加
     public function eventJoinform($eventId) {
         $event = Event::find($eventId);
+        $eventid = $event->id;
+        $userId = Auth::id();
+        
+        if(Event_user::where('user_id', $userId)->where('event_id', $eventid)->exists()) {
+            $Event_user = 1;
+        } else {
+            $Event_user = 0;
+        }
 
          return view('event_join',[
             'event' => $event,
+            'Event_user' => $Event_user,
         ]);
     }
 
@@ -46,13 +55,13 @@ class RegistrationController extends Controller
         ]);
     }
 
-    public function userCancel(Request $request) {
+    public function userCancel(int $id, Request $request) {
         $user = Auth::user();
         $userId = $user->id;
-        $eventId = $request->input('event_id');
-        $events = $user->Event_user->map(fn($eu) => $eu->Event);
 
-        Event_user::where('event_id', $eventId)->where('user_id', $userId)->delete();
+        Event_user::where('event_id', $id)->where('user_id', $userId)->delete();
+
+        $events = $user->Event_user->map(fn($eu) => $eu->Event);
 
         return redirect()->route('user.join', [
             'id' => $userId,
