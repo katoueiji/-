@@ -8,17 +8,22 @@ use App\Event;
 use App\Event_user;
 use App\User;
 use App\userDate;
+use App\Reports;
 
 class RegistrationController extends Controller
 {
     //イベント参加
     public function eventJoinform($eventId) {
-        $event = Event::find($eventId);
+        $event = Event::findOrFail($eventId);
         $eventid = $event->id;
         $userId = Auth::id();
-        
+        $currentCount = Event_user::where('event_id', $eventId)->count();
+        $capacity = $event->capacity;
+                
         if(Event_user::where('user_id', $userId)->where('event_id', $eventid)->exists()) {
             $Event_user = 1;
+        } elseif ($currentCount >= $capacity){
+            $Event_user = 2;
         } else {
             $Event_user = 0;
         }
@@ -31,7 +36,7 @@ class RegistrationController extends Controller
 
     public function eventJoin(int $id, Request $request) {
         $event_user = new  Event_user;
-        $eventId = Event::find($id);
+        $eventId = Event::findOrFail($id);
         $user = Auth::id();
 
         $event_user->event_id = $eventId->id;
@@ -41,13 +46,38 @@ class RegistrationController extends Controller
 
         $event_user->save();
 
-        return redirect('/top');
+        return redirect('/');
+    }
+
+    //イベント報告
+    public function eventReportform($eventId) {
+        $event = Event::findOrFail($eventId);
+        $eventid = $event->id;
+        $userId = Auth::id();
+
+        return view('event_report',[
+            'event' => $event,
+        ]);
+    }
+
+    public function eventReport(int $id, Request $request) {
+        $reports = new Reports;
+        $event = Event::findOrFail($id);
+        $user = Auth::id();
+
+        $reports->event_id = $event->id;
+        $reports->user_id = $user;
+        $reports->comment = $request->comment;
+
+        $reports->save();
+
+        return redirect('/');    
     }
 
     //イベント参加取り消し
     public function userCancelform($eventId) { 
-        $user = Auth::id();
-        $event = Event::find($eventId);
+        $user = Auth::user();
+        $event = Event::findOrFail($eventId);
 
         return view('user_cancel',[
             'user' => $user,
@@ -71,7 +101,7 @@ class RegistrationController extends Controller
 
     //プロフィール編集
     public function profileEditform($userId) {
-        $user = User::find($userId);
+        $user = User::findOrFail($userId);
         $date = $user->userDate;
         $prevUrl = url()->previous();
         session(['profile_url' => $prevUrl]);
@@ -87,10 +117,18 @@ class RegistrationController extends Controller
         $date = $user->userDate ?? $user->userDate()->create([]);
         $url = session('profile_url');
 
+        if (!empty($request->file)) {
+        $file = $request->file('image');
+        $file_name = $file->getClientOriginalName();
+        $file->storeAs('public/profile', $file_name);
+
+        $date->image = $file_name;    
+        }
+
+
         $user->name = $request->name;
         $user->email = $request->email;
         $date->comment = $request->comment;
-        $date->image = $request->image;
 
         $user->save();
         $date->save();
@@ -100,7 +138,7 @@ class RegistrationController extends Controller
 
     //退会・ログアウト画面
     public function userEdit($userId) {
-        $user = User::find($userId);
+        $user = User::findOrFail($userId);
         $date = $user->userDate;
 
         return view('user_edit', [
@@ -119,7 +157,7 @@ class RegistrationController extends Controller
 
     //イベント編集画面
     public function eventEditform($eventId) {
-        $Event = Event::find($eventId);
+        $Event = Event::findOrFail($eventId);
         $prevUrl = url()->previous();
         session(['profile_url' => $prevUrl]);
 
@@ -130,7 +168,7 @@ class RegistrationController extends Controller
 
     public function eventEdit(int $id, Request $request) {
         $event = new Event;
-        $record = $event->find($id);
+        $record = $event->findOrFail($id);
         $url = session('profile_url');
 
         $colums = ['capacity', 'title', 'image', 'comment', 'date', 'format'];
@@ -146,7 +184,7 @@ class RegistrationController extends Controller
 
     //イベント削除確認画面
     public function eventDestroyform($eventId) {
-        $event = Event::find($eventId);
+        $event = Event::findOrFail($eventId);
         
         return view('event_destroy', [
             'event' => $event,
@@ -154,7 +192,7 @@ class RegistrationController extends Controller
     }
 
     public function eventDestroy(int $id, Request $request) {
-        $event = Event::find($id);
+        $event = Event::findOrFail($id);
         $event -> delete();
 
         $userId = Auth::id();
@@ -181,15 +219,59 @@ class RegistrationController extends Controller
         $event = new Event;
         $url = session('profile_url');
 
-        $colums = ['capacity', 'title', 'image', 'comment', 'date', 'format', 'type'];
+        $file = $request->file('image');
+        $file_name = $file->getClientOriginalName();
+        $file->storeAs('public/profile', $file_name);
+
+        $colums = ['capacity', 'title', 'comment', 'date', 'format', 'type'];
 
         foreach ($colums as $colum) {
             $event -> $colum = $request -> $colum;
         }
         $event -> user_id = $user;
+        $event -> image = $file_name;
         
         $event->save();
 
         return redirect($url);
     }
+
+    //イベント非表示
+    public function eventHiddenform($eventId) {
+        $event = Event::findOrFail($eventId);
+        
+        return view('event_hidden', [
+            'event' => $event,
+        ]);
+    }
+
+    public function eventHidden(int $id, Request $request) {
+        $event = Event::findOrFail($id);
+        
+        $event->is_visible = 1;
+
+        $event->save();
+        
+        return redirect('/event');
+    }
+
+    //ユーザー利用停止
+    public function userHiddenform($userId) {
+        $user = User::findOrFail($userId);
+
+        return view('user_hidden', [
+            'user' => $user,
+        ]);
+    }
+
+    public function userHidden(int $id, Request $request) {
+        $user = User::findOrFail($id);
+
+        $user->is_active = 1;
+        
+        $user->save();
+        
+        return redirect('/user');
+    }
+
 }

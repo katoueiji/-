@@ -8,16 +8,16 @@
 
     <table class="table table-bordered mt-3">
             <tr>
-                <th>{{ $event->id }}</th>
+                <td><img src="{{ asset('storage/profile/' . $event->image) }}" width="120"></td>
+                <td>{{ $event->id }}</td>
                 <td>{{ $event->capacity }}</td>
                 <td>{{ $event->title }}</td>
-                <td>{{ $event->image }}</td>
             </tr>
 
     </table>
 
     <div class="mt-4">
-        <form action="{{ route('user.join', ['id' => $event->id]) }}" method="get">
+        <form action="{{ route('user.join', ['id' => $user->id]) }}" method="get">
             <button type="submit" class="btn btn-primary">戻る</button>
         </form>
         <form action="{{ route('user.cancel', ['id' => $event->id]) }}" method="POST">

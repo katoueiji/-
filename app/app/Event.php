@@ -15,4 +15,13 @@ class Event extends Model
     {
         return $this->hasMany('App\Event_user', 'id', 'event_id');
     }
+
+        public function Reports()
+    {
+        return $this->hasMany('App\Reports', 'event_id', 'id');
+    }
+
+    public function bookmark() {
+        return $this->hasMany(bookmark::class);
+    }
 }

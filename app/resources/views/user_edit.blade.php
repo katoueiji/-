@@ -6,10 +6,10 @@
 
     <table class="table table-bordered mt-3">
             <tr>
-                <th>{{ $user->id }}</th>
+                <td><img src="{{ asset('storage/profile/' . $date->image) }}" width="120"></td>
+                <td>{{ $user->id }}</td>
                 <td>{{ $user->name }}</td>
                 <td>{{ $date->comment ?? '' }}</td>
-                <td>{{ $date->image ?? '' }}</td>
             </tr>
 
     </table>

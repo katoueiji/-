@@ -14,11 +14,11 @@
                 <th scope="col">
                  <a href="{{ route('event.detail', ['id' => $event['id']]) }}">#</a>
             </th>
+                <th><img src="{{ asset('storage/profile/' . $event['image']) }}" alt="プロフィール画像" width="120"></th>
                 <th>{{ $event['id'] }}</th>
                 <th>{{ $event['user_id'] }}</th>
                 <th>{{ $event['capacity'] }}</th>
                 <th>{{ $event['title'] }}</th>
-                <th>{{ $event['image'] }}</th>
                 <th>{{ $user->id }}</th>
 
             <td>

@@ -3,8 +3,7 @@
 @section('content')
 <div class="container">
     <h2>データ確認</h2>
-
-    <h2>本当に削除しますか？</h2>
+    <h2>本当に非表示にしますか？</h2>
 
     <table class="table table-bordered mt-3">
             <tr>
@@ -15,14 +14,14 @@
             </tr>
 
     </table>
-
-    <div class="mt-4">
-        <form action="{{ route('event.Edit', ['id' => $event->id]) }}" method="get">
-            <button type="submit" class="btn btn-primary">キャンセル</button>
+        <div class="mt-4">
+        <form action="{{ route('event.detail', ['id' => $event->id]) }}" method="get">
+            <button type="submit" class="btn btn-primary">戻る</button>
         </form>
-        <form action="{{ route('event.Destroy', ['id' => $event->id]) }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-primary">削除する</button>
+        
+        <form action="{{ route('event.hidden', ['id' => $event->id]) }}" method="post">
+        @csrf
+            <button type="submit" class="btn btn-primary">非表示にする</button>
         </form>
     </div>
 </div>

@@ -14,27 +14,25 @@
 
     <table class="table table-bordered mt-3">
             <tr>
-                <td><img src="{{ asset('storage/profile/' . $event->image) }}" width="120"></td>
-                <td>{{ $event->id }}</td>
+                <th>{{ $event->id }}</th>
                 <td>{{ $event->capacity }}</td>
+                <td>{{ $event->title }}</td>
                 <td>{{ $event->image }}</td>
             </tr>
 
     </table>
 
     <div class="mt-4">
-        @if($Event_user == 0)
-        <form action="{{ route('event.join', ['id' => $event->id]) }}" method="POST">
+        <form action="{{ route('event.report', ['id' => $event->id]) }}" method="POST">
             @csrf
             <label for='comment'>こめんト</label>
             <input type='text' class='form-control' name='comment'/>
-            <button type="submit" class="btn btn-primary">参加する</button>
+            <button type="submit" class="btn btn-primary">報告する</button>
         </form>
-        @elseif($Event_user == 1)
-        <button class="btn btn-primary" disabled>参加済み</button>
-        @elseif($Event_user == 2)
-        <button class="btn btn-primary" disabled>このイベントは満員です</button>
-        @endif
+
+        <form action="{{ route('event.detail', ['id' => $event->id]) }}" method="GET">
+            <button type="submit" class="btn btn-primary">キャンセル</button>
+        </form>
     </div>
 </div>
 @endsection

@@ -52,4 +52,21 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Event_user', 'user_id', 'id');
     }
+
+    public function Reports() 
+    {
+        return $this->hasMany('App\Reports', 'user_id', 'id');
+    }
+
+    public function Bookmark() {
+        return $this->hasMany('App\Bookmark', 'user_id', 'id');
+    }
+
+    public function Bookmark_event() {
+        return $this->belongsToMany('App\Event', 'bookmarks', 'user_id', 'event_id');
+    }
+
+    public function is_Bookmark($eventId) {
+        return $this->Bookmark()->where('event_id', $eventId)->exists();
+    }
 }

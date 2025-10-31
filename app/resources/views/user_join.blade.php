@@ -12,19 +12,19 @@
                  <a href="{{ route('event.detail', ['id' => $event['id']]) }}">#</a>
                  
             </th>
-                <th>{{ $event['id'] }}</th>
-                <th>{{ $event['user_id'] }}</th>
-                <th>{{ $event['capacity'] }}</th>
-                <th>{{ $event['title'] }}</th>
-                <th>{{ $event['image'] }}</th>
-                <th>{{ $user->id }}</th>
+                <td><img src="{{ asset('storage/profile/' . $event['image']) }}" width="120"></td>
+                <td>{{ $event['id'] }}</td>
+                <td>{{ $event['user_id'] }}</td>
+                <td>{{ $event['capacity'] }}</td>
+                <td>{{ $event['title'] }}</td>
+                <td>{{ $user->id }}</td>
 
             <td>
             <a href="{{ route('user.cancel', ['id' => $event['id']]) }}">
             <button type="submit" class="btn btn-primary">取り消し</button></a>
             </td>
             </tr>
-@endif
+                @endif
                 @endforeach
     </table>
 
